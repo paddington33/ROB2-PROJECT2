@@ -19,10 +19,10 @@ public:
 	RRTNode();
 	virtual ~RRTNode();
 
-    RRTNode getParrent() const;
+    RRTNode * getParrent() const;
     rw::math::Q getValue() const;
 
-    void setParrent(RRTNode parrent);
+    void setParrent(RRTNode* parrent);
     void setValue(rw::math::Q value);
 
 };

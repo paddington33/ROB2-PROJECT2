@@ -8,12 +8,12 @@
 #include "RRTNode.h"
 
 RRTNode::RRTNode() :
-	_parrent(null)
+	_parrent(NULL)
 {
 
 }
 
-RRTNode::RRTNode(math::Q value, RRTNode parrent) :
+RRTNode::RRTNode(rw::math::Q value, RRTNode* parrent) :
 	_value(value),
 	_parrent(parrent)
 {
@@ -22,22 +22,22 @@ RRTNode::RRTNode(math::Q value, RRTNode parrent) :
 
 RRTNode::~RRTNode() {}
 
-RRTNode RRTNode::getParrent() const
+RRTNode* RRTNode::getParrent() const
 {
-    return parrent;
+    return _parrent;
 }
 
-math::Q RRTNode::getValue() const
+rw::math::Q RRTNode::getValue() const
 {
-    return value;
+    return _value;
 }
 
-void RRTNode::setParrent(RRTNode parrent)
+void RRTNode::setParrent(RRTNode * parrent)
 {
-    this->parrent = parrent;
+    this->_parrent = parrent;
 }
 
-void RRTNode::setValue(math::Q value)
+void RRTNode::setValue(rw::math::Q value)
 {
-    this->value = value;
+    this->_value = value;
 }
