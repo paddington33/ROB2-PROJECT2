@@ -15,6 +15,7 @@ private:
 public:
 	RRT();
 	virtual ~RRT();
+	RRTNode getClosestNode(rw::math::Q node);
 };
 
 #endif /* RRT_H_ */

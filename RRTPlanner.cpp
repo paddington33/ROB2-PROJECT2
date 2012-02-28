@@ -41,8 +41,17 @@ void RRTPlanner::Plan(rw::math::Q qInit, rw::math::Q qGoal)
 	for(int i = 0; i < K ;i++)
 	{
 		rw::math::Q randQ = rw::math::Math::ranQ(device->getBounds());
+		RRTNode* closestNode = currentTree->getClosestNode(randQ);
+		rw::math::Q closestQ = closestNode.getValue();
 
+		rw::math::Q direction = randQ - closestQ;
 
-		randQ -
+		rw::math::Q newQ = cloestQ + direction*epsilon;
+
+		if(!constraint->inCollision(newQ))
+		{
+			RRT
+		}
+
 	}
 }
