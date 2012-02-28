@@ -2,7 +2,7 @@
  * RRTPlanner.cpp
  *
  *  Created on: Feb 27, 2012
- *      Author: daniel
+ *      Author: Daniel
  */
 
 #include "RRTPlanner.h"
@@ -47,6 +47,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	RRT* bTree = new RRT();
 
 	RRT* currentTree = aTree;
+	RRT* secondTree = bTree;
 
 	int K = 100; //Number of tries
 
@@ -65,13 +66,14 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 
 		//Early tree swap
 		currentTree = (currentTree == aTree) ? bTree : aTree;
+		secondTree = (currentTree == aTree) ? aTree : bTree;
 
 		if(!constraint->inCollision(newQ))
 		{
 			RRTNode* newNode = new RRTNode();
 			newNode->setValue(newQ);
 			newNode->setParrent(closestNode);
-
+			secondTree->addNodeToTree(newNode);
 
 			RRTNode* closestNodeInTheOtherTree = currentTree->getClosestNode(newQ);
 			rw::math::Q closestQInTheOtherTree = closestNodeInTheOtherTree->getValue();
@@ -98,6 +100,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 				newNode = new RRTNode();
 				newNode->setValue(tempQ);
 				newNode->setParrent(newNode);
+				secondTree->addNodeToTree(newNode);
 			}
 			else
 			{
