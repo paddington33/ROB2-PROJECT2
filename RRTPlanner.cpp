@@ -6,12 +6,17 @@
  */
 
 #include "RRTPlanner.h"
+#include "rw/math.hpp"
 
 RRTPlanner::RRTPlanner() {
-	// TODO Auto-generated constructor stub
 
 }
 
 RRTPlanner::~RRTPlanner() {
-	// TODO Auto-generated destructor stub
+
+}
+
+void RRTPlanner::Plan(rw::math::Q qInit, rw::math::Q qGoal)
+{
+
 }
