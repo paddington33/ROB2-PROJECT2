@@ -46,6 +46,7 @@ bin/
 lib/
 msg_gen/
 srv_gen/
+CMakeFiles/
 
 # Editor backup files #
 #######################
