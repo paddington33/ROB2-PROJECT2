@@ -1,0 +1,24 @@
+K 14
+bugtraq:number
+V 4
+true
+K 10
+svn:ignore
+V 178
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+RobWork.cmake
+bin
+CMakeFiles
+apidocs
+.cproject
+.project
+build
+.csettings
+CPackConfig.cmake
+CPackSourceConfig.cmake
+.cproject
+.project
+
+END

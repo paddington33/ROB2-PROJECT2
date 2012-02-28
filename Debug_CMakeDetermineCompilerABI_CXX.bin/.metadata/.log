@@ -1,0 +1,18 @@
+!SESSION 2012-02-10 10:54:19.082 -----------------------------------------------
+eclipse.buildId=M20100211-1343
+java.version=1.6.0_22
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86, WS=gtk, NL=en_DK
+Command-line arguments:  -os linux -ws gtk -arch x86
+
+!ENTRY org.eclipse.cdt.core 1 0 2012-02-10 10:58:58.027
+!MESSAGE Indexed 'Rob2 Project1' (0 sources, 77 headers) in 2.18 sec: 2,231 declarations; 2,497 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0.00%)
+!SESSION 2012-02-10 11:40:37.512 -----------------------------------------------
+eclipse.buildId=M20100211-1343
+java.version=1.6.0_22
+java.vendor=Sun Microsystems Inc.
+BootLoader constants: OS=linux, ARCH=x86, WS=gtk, NL=en_DK
+Command-line arguments:  -os linux -ws gtk -arch x86
+
+!ENTRY org.eclipse.cdt.core 1 0 2012-02-10 11:45:52.452
+!MESSAGE Indexed 'Debug_CMakeDetermineCompilerABI_CXX.bin' (0 sources, 8 headers) in 0.04 sec: 0 declarations; 0 references; 8 unresolved inclusions; 0 syntax errors; 0 unresolved names (0.00%)

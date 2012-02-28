@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>Debug_CMakeDetermineCompilerABI_CXX.bin</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>CMakeDetermineCompilerABI_C.bin</name>
+			<type>1</type>
+			<location>/home/daniel/robwork/RobWorkStudio/example/tutorial/CMakeFiles/CMakeDetermineCompilerABI_C.bin</location>
+		</link>
+		<link>
+			<name>CMakeDetermineCompilerABI_CXX.bin</name>
+			<type>1</type>
+			<location>/home/daniel/robwork/RobWorkStudio/example/tutorial/CMakeFiles/CMakeDetermineCompilerABI_CXX.bin</location>
+		</link>
+		<link>
+			<name>a.out</name>
+			<type>1</type>
+			<location>/home/daniel/robwork/RobWorkStudio/example/tutorial/CMakeFiles/CompilerIdCXX/a.out</location>
+		</link>
+		<link>
+			<name>libSamplePlugin.so</name>
+			<type>1</type>
+			<location>/home/daniel/robwork/RobWorkStudio/example/tutorial/libSamplePlugin.so</location>
+		</link>
+	</linkedResources>
+</projectDescription>
