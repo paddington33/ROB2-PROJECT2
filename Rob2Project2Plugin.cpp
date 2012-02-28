@@ -99,6 +99,8 @@ void SamplePlugin::stateChangedListener(const State& state) {
 
 void SamplePlugin::clickEvent() {
 
+
+	std::cout << "Daniel er sej" << std::endl;
 	QObject *obj = sender();
 
 	RRT* tree = new RRT();
