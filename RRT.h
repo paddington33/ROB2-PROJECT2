@@ -2,7 +2,7 @@
  * RRT.h
  *
  *  Created on: Feb 23, 2012
- *      Author: daniel
+ *      Author: daniel test
  */
 #include "RRTNode.h"
 
