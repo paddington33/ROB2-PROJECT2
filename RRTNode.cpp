@@ -7,7 +7,9 @@
 
 #include "RRTNode.h"
 
-RRTNode::RRTNode() {
+RRTNode::RRTNode() :
+	_parrent(null)
+{
 
 }
 
