@@ -9,12 +9,13 @@
 #define RRTPLANNER_H_
 
 #include "rw/math.hpp"
+#include "list"
 
 class RRTPlanner {
 public:
 	RRTPlanner();
 	virtual ~RRTPlanner();
-	void plan(rw::math::Q qInit, rw::math::Q qGoal);
+	std::list<rw::math::Q> plan(rw::math::Q qInit, rw::math::Q qGoal);
 };
 
 #endif /* RRTPLANNER_H_ */
