@@ -20,6 +20,7 @@ RRTPlanner::~RRTPlanner() {
 
 std::list<rw::math::Q> RRTPlanner::Plan(rw::math::Q qInit, rw::math::Q qGoal)
 {
+	//comments
 
 	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkCell();
 	rw::common::Ptr<rw::models::Device> device = workcell->findDevice("KukaKr16");
