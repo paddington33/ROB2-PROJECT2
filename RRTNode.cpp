@@ -20,7 +20,6 @@ RRTNode::RRTNode(rw::math::Q value, RRTNode* parrent) :
 
 }
 
-RRTNode::~RRTNode() {}
 
 RRTNode* RRTNode::getParrent() const
 {

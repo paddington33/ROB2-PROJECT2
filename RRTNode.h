@@ -17,7 +17,8 @@ private:
 	rw::math::Q _value;
 public:
 	RRTNode();
-	virtual ~RRTNode();
+	RRTNode(rw::math::Q value, RRTNode* parrent);
+
 
     RRTNode * getParrent() const;
     rw::math::Q getValue() const;
