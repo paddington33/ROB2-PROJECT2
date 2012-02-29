@@ -24,7 +24,7 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 }
 
 RRTMTPlanner::~RRTMTPlanner() {
-
+	assert(_cFree);
 }
 
 void RRTMTPlanner::initTrees(rw::math::Q qInit, rw::math::Q qGoal)
@@ -47,7 +47,7 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	{
 		rw::common::Ptr<RRT> currentTree = chooseTree(NULL);
 		rw::common::Ptr<RRTNode> newNode = extendTreeInRandomDirection(currentTree);
-		rw::common::Ptr<RRTNode> closestNode = cloestNodeInAnyOtherTree(currentTree,newNode);
+		rw::common::Ptr<RRTNode> closestNode = closestNodeInAnyOtherTree(currentTree,newNode);
 
 		if( ((rw::math::Q)(newNode->getValue() - closestNode->getValue())).norm2() < _d )
 			//Connect somehow
@@ -60,6 +60,28 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree)
 {
 
+	rw::math::Q rndQ = _cFree->sample();
+
+	rw::common::Ptr<RRTNode> tmpNode = new RRTNode();
+	rw::common::Ptr<RRTNode> cloNode = new RRTNode();
+	rw::common::Ptr<RRTNode> newNode = new RRTNode();
+
+	tmpNode->setValue(rndQ);
+	cloNode = currentTree->getClosestNode(rndQ);
+
+	rw::math::Q dirQ = tmpNode->getValue()- cloNode->getValue();
+	rw::math::Q newQ = cloNode->getValue() + dirQ*_epsilon;
+	rw::math::Q stpQ = _epsilon*dirQ/dirQ.norm2();
+
+	newNode->setValue(cloNode->getValue()+stpQ);
+	if(!_constraint->inCollision(newNode->getValue())){
+		currentTree->addNodeToTree(newNode);
+		return newNode;
+	}
+	return NULL;
+
+	return tmpNode;
+
 }
 
 bool RRTMTPlanner::edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw::common::Ptr<RRTNode> nodeNew)
@@ -71,13 +93,13 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::closestNodeInAnyOtherTree(rw::common::Ptr
 {
 
 	double distanceToNode = std::numeric_limits<double>::max();
-	RRTNode * bstNode = NULL;
-	RRTNode * tmpNode = NULL;
+	rw::common::Ptr<RRTNode> bstNode = NULL;
+	rw::common::Ptr<RRTNode> tmpNode = NULL;
 
 	std::list<rw::common::Ptr<RRT> >::iterator it;
 
 	for(it = _trees.begin(); it!=_trees.end(); ++it){
-		tmpNode = (*it)->getClosestNode(currentNode->setValue());
+		tmpNode = ((*it)->getClosestNode(currentNode->getValue()));
 
 		if(bstNode == NULL){
 			bstNode = tmpNode;
