@@ -12,14 +12,28 @@
 #include "RRTNode.h"
 #include "RRT.h"
 #include <rws/RobWorkStudio.hpp>
+
+#include <rwlibs/proximitystrategies/ProximityStrategyFactory.hpp>
+
 #include <rw/trajectory.hpp>
 #include <rw/common.hpp>
+#include <rw/pathplanning/QConstraint.hpp>
+
+
 
 
 class RRTMTPlanner: public RRTPlanner {
 private:
 	std::list<rw::common::Ptr<RRT> > _trees;
+
+	rw::common::Ptr<rw::models::WorkCell> _workcell;
+	rw::common::Ptr<rw::models::Device> _device;
+	rw::common::Ptr<rw::proximity::CollisionStrategy> _cdstrategy;
+	rw::common::Ptr<rw::proximity::CollisionDetector> _collisionDetector;
+	rw::common::Ptr<rw::pathplanning::QConstraint> _constraint;
+
 	int _connectN;
+
 public:
 	RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN = -1);
 	rw::trajectory::QPath plan(rw::math::Q qInit, rw::math::Q qGoal);

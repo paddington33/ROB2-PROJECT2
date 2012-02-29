@@ -12,6 +12,11 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 	_connectN(connectN)
 {
 
+	_workcell = robWorkStudio->getWorkcell();
+	_device = _workcell->findDevice("KukaKr16");
+	_cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
+	_collisionDetector = new rw::proximity::CollisionDetector(_workcell, _cdstrategy);
+	_constraint = rw::pathplanning::QConstraint::make(_collisionDetector, _device, _workcell->getDefaultState());
 }
 
 RRTMTPlanner::~RRTMTPlanner() {
