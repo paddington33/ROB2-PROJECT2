@@ -24,8 +24,6 @@ RRTMTPlanner::~RRTMTPlanner() {
 }
 
 void RRTMTPlanner::initTrees()
-<<<<<<< OURS
-=======
 {
 	_trees.push_back(new RRT(qInit));
 
@@ -38,7 +36,6 @@ void RRTMTPlanner::initTrees()
 }
 
 rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
->>>>>>> THEIRS
 {
 	_trees.push_back(new RRT(qInit));
 
