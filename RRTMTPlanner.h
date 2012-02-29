@@ -33,7 +33,9 @@ private:
 	rw::common::Ptr<rw::pathplanning::QConstraint> _constraint;
 
 	int _connectN;
+
 	double _d; //Min distance to test connection
+
 public:
 	RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN = -1);
 	void initTrees();
