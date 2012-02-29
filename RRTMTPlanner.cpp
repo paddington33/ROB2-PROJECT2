@@ -67,14 +67,27 @@ bool RRTMTPlanner::edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw
 
 }
 
-rw::common::Ptr<RRTNode> RRTMTPlanner::cloestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> currentNode)
+rw::common::Ptr<RRTNode> RRTMTPlanner::closestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> currentNode)
 {
-	RRTNode * inewNode = NULL;
 
-	_trees.size()
+	double distanceToNode = std::numeric_limits<double>::max();
+	RRTNode * bstNode = NULL;
+	RRTNode * tmpNode = NULL;
 
-	for()
+	std::list<rw::common::Ptr<RRT> >::iterator it;
 
+	for(it = _trees.begin(); it!=_trees.end(); ++it){
+		tmpNode = (*it)->getClosestNode(currentNode->setValue());
+
+		if(bstNode == NULL){
+			bstNode = tmpNode;
+		}else if(((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2() < distanceToNode){
+			distanceToNode = ((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2();
+			bstNode = tmpNode;
+		}
+	}
+
+	return bstNode;
 }
 
 

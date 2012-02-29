@@ -46,7 +46,7 @@ public:
 	rw::trajectory::QPath plan(rw::math::Q qInit, rw::math::Q qGoal);
 	rw::common::Ptr<RRTNode> extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree);
 	bool edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw::common::Ptr<RRTNode> nodeNew);
-	rw::common::Ptr<RRTNode> cloestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree,rw::common::Ptr<RRTNode> currentNode);
+	rw::common::Ptr<RRTNode> closestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree,rw::common::Ptr<RRTNode> currentNode);
 	bool connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> newNode, rw::common::Ptr<RRTNode> closestNode);
 	rw::common::Ptr<RRT> chooseTree(rw::common::Ptr<RRT> currentTree);
 	virtual ~RRTMTPlanner();
