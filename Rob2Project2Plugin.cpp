@@ -1,5 +1,7 @@
 #include "Rob2Project2Plugin.hpp"
 
+
+
 #include <QPushButton>
 #include <qspinbox.h>
 #include <qprogressbar.h>
@@ -18,6 +20,8 @@
 
 #include <rw/pathplanning/QConstraint.hpp>
 #include <rw/pathplanning/QSampler.hpp>
+#include <rw/models/Models.hpp>
+#include <rw/trajectory/TimedUtil.hpp>
 
 #include <cmath>
 
@@ -26,6 +30,7 @@
 #include <time.h>
 
 #include "RRT.h"
+#include "RRTPlanner.h"
 
 
 USE_ROBWORK_NAMESPACE
@@ -99,9 +104,61 @@ void SamplePlugin::stateChangedListener(const State& state) {
 
 void SamplePlugin::clickEvent() {
 
-	QObject *obj = sender();
+	std::cout << "We are here1" << std::endl;
 
-	RRT* tree = new RRT();
+	using namespace proximity;
+
+	rws::RobWorkStudio* robWorkStudio = getRobWorkStudio();
+
+
+	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkCell();
+	rw::models::Device::Ptr device = workcell->findDevice("KukaKr16");
+
+	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
+	CollisionDetector::Ptr collisionDetector = new CollisionDetector(workcell, cdstrategy);
+
+	rw::pathplanning::QConstraint::Ptr constraint = rw::pathplanning::QConstraint::make(
+			collisionDetector, device, workcell->getDefaultState());
+
+	QSampler::Ptr cFree = QSampler::makeConstrained(QSampler::makeUniform(device),constraint);
+
+	std::cout << "We are here1.2" << std::endl;
+
+	RRTPlanner* planner = new RRTPlanner(robWorkStudio);
+
+	std::cout << "We are here2" << std::endl;
+
+	rw::math::Q qInit = cFree->sample();
+	rw::math::Q qGoal = cFree->sample();
+
+	std::cout << "We are here2.5" << std::endl;
+
+	std::list<rw::math::Q> path = planner->plan(qInit,qGoal);
+
+	std::cout << "We are here3" << std::endl;
+
+	std::cout << "path length " << path.size() << std::endl;
+
+	rw::trajectory::QPath qpath;// = new rw::trajectory::QPath();
+
+	std::list<rw::math::Q>::iterator it;
+	int i = 0;
+	for(it = path.begin();it != path.end();it++)
+	{
+		std::cout << "addQ( tpath," << (double)(i++)*.01 << "," << *it << " )" <<  std::endl;
+		qpath.push_back(*it);
+	}
+
+	rw::kinematics::State state = workcell->getDefaultState();
+
+	robWorkStudio->setTimedStatePath(
+	        TimedUtil::makeTimedStatePath(
+	            *workcell,
+	            rw::models::Models::getStatePath(*device, qpath, state)));
+
+
+
+
 
 }
 
