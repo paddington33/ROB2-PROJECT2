@@ -27,7 +27,7 @@ RRTNode * RRT::getClosestNode(rw::math::Q node) {
 	std::list<RRTNode*>::iterator itt;
 	for (itt = _tree.begin(); itt != _tree.end(); itt++) {
 		tempQ = (*itt)->getValue();
-		if((tempQ - node).norm2() > distanceToNode){
+		if((tempQ - node).norm2() < distanceToNode){
 			distanceToNode = (tempQ - node).norm2();
 			closestNode = *itt;
 		}
