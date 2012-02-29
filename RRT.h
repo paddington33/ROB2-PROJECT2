@@ -24,6 +24,9 @@ public:
 
 	bool addNodeToTree(rw::common::Ptr<RRTNode>);
 	rw::common::Ptr<RRTNode> getClosestNode(rw::math::Q node);
+
+	std::list<rw::common::Ptr<RRTNode> > getListOfNodes();
+
 };
 
 #endif /* RRT_H_ */

@@ -40,6 +40,9 @@ rw::common::Ptr<RRTNode> RRT::getClosestNode(rw::math::Q node) {
 	return closestNode;
 }
 
+std::list<rw::common::Ptr<RRTNode> > RRT::getListOfNodes(){
+	return _tree;
+}
 
 bool RRT::addNodeToTree(rw::common::Ptr<RRTNode> newNode) {
 	_tree.push_back(newNode);
