@@ -26,5 +26,5 @@ QT4_WRAP_CPP(MocSrcFiles Rob2Project2Plugin.hpp)
 QT4_ADD_RESOURCES(RccSrcFiles resources.qrc)
 
   # The shared library to build:
-ADD_LIBRARY(Rob2Project2Plugin MODULE Rob2Project2Plugin.cpp RRT.cpp RRTNode.cpp RRTPlanner.cpp ${MocSrcFiles}  ${RccSrcFiles})
+ADD_LIBRARY(Rob2Project2Plugin MODULE Rob2Project2Plugin.cpp RRT.cpp RRTNode.cpp RRTPlanner.cpp RRTMTPlanner.cpp ${MocSrcFiles}  ${RccSrcFiles})
 TARGET_LINK_LIBRARIES(Rob2Project2Plugin ${ROBWORKSTUDIO_LIBRARIES} ${ROBWORK_LIBRARIES})
