@@ -4,6 +4,10 @@
  *  Created on: Feb 23, 2012
  *      Author: daniel test
  */
+
+#ifndef RRT_H_
+#define RRT_H_
+
 #include "RRTNode.h"
 #include <rw/math.hpp>
 #include <rw/common.hpp>
@@ -11,8 +15,7 @@
 
 #include <list>
 
-#ifndef RRT_H_
-#define RRT_H_
+class RRTNode;
 
 class RRT {
 private:

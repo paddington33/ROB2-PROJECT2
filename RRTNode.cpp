@@ -26,6 +26,14 @@ rw::common::Ptr<RRTNode> RRTNode::getParrent() const
     return _parrent;
 }
 
+void RRTNode::addTreeToNode(rw::common::Ptr<RRT> tree){
+	_tree = tree;
+}
+
+rw::common::Ptr<RRT> RRTNode::getTree(){
+	return  _tree;
+}
+
 rw::math::Q RRTNode::getValue() const
 {
     return _value;

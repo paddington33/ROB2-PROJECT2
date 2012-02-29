@@ -46,6 +46,9 @@ std::list<rw::common::Ptr<RRTNode> > RRT::getListOfNodes(){
 
 bool RRT::addNodeToTree(rw::common::Ptr<RRTNode> newNode) {
 	_tree.push_back(newNode);
+
+	newNode->addTreeToNode(this);
+
 	return !(_tree.empty());
 }
 
