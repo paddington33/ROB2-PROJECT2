@@ -33,6 +33,9 @@ private:
 	rw::common::Ptr<rw::pathplanning::QConstraint> _constraint;
 
 	int _connectN;
+	double _epsilon;
+
+	double _d; //Min distance to test connection
 
 	double _d; //Min distance to test connection
 

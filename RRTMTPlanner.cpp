@@ -24,6 +24,21 @@ RRTMTPlanner::~RRTMTPlanner() {
 }
 
 void RRTMTPlanner::initTrees()
+<<<<<<< OURS
+=======
+{
+	_trees.push_back(new RRT(qInit));
+
+	for(int i = 1 ; i < _numberOfTrees -1 ; i++ )
+		_trees.push_back(new RRT(cFree->sample()));
+
+
+	if(_numberOfTrees != 1)
+		_trees.push_back(new RRT(qGoal));
+}
+
+rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
+>>>>>>> THEIRS
 {
 	_trees.push_back(new RRT(qInit));
 
@@ -68,9 +83,36 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::cloestNodeInAnyOtherTree(rw::common::Ptr<
 
 }
 
-void RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> newNode, rw::common::Ptr<RRTNode> closestNode)
+bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> newNode, rw::common::Ptr<RRTNode> closestNode)
 {
+	assert(_epsilon);
 
+	rw::math::Q dirQ = newNode->getValue() - closestNode->getValue();
+	rw::math::Q newQ = closestNode->getValue() + dirQ*_epsilon;
+	rw::math::Q stpQ = _epsilon*dirQ/dirQ.norm2();
+	rw::math::Q tmpQ = newQ;
+
+	bool reached = false;
+
+	if(!_constraint->inCollision(closestNode->getValue()))
+	{
+
+		do {
+			if (((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon)
+				reached = true;
+			tmpQ += stpQ;
+		} while (!_constraint->inCollision(tmpQ) && !reached);
+
+		tmpQ -= stpQ;
+
+		RRTNode* inewNode;
+		inewNode = new RRTNode();
+		inewNode->setValue(tmpQ);
+		inewNode->setParrent(newNode.get());
+		currentTree->addNodeToTree(inewNode);
+	}
+
+	return reached;
 }
 
 rw::common::Ptr<RRT> RRTMTPlanner::swap(rw::common::Ptr<RRT> currentTree)

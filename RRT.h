@@ -6,7 +6,13 @@
  */
 #include "RRTNode.h"
 #include <rw/math.hpp>
+<<<<<<< OURS
+=======
+#include <rw/common.hpp>
+
+>>>>>>> THEIRS
 #include <limits>
+
 
 
 
@@ -17,15 +23,14 @@
 
 class RRT {
 private:
-	std::list<RRTNode *> _tree;
+	std::list<rw::common::Ptr<RRTNode> > _tree;
 public:
 	RRT();
 	RRT(rw::math::Q q);
 	virtual ~RRT();
 
-	bool addNodeToTree(RRTNode * nodeNew);
-
-	RRTNode * getClosestNode(rw::math::Q node);
+	bool addNodeToTree(rw::common::Ptr<RRTNode>);
+	rw::common::Ptr<RRTNode> getClosestNode(rw::math::Q node);
 };
 
 #endif /* RRT_H_ */

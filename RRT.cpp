@@ -21,13 +21,13 @@ RRT::~RRT() {
 
 }
 
-RRTNode * RRT::getClosestNode(rw::math::Q node) {
+rw::common::Ptr<RRTNode> RRT::getClosestNode(rw::math::Q node) {
 
-	RRTNode * closestNode = NULL;
+	rw::common::Ptr<RRTNode> closestNode = NULL;
 	rw::math::Q tempQ;
 	double distanceToNode = std::numeric_limits<double>::max();
 
-	std::list<RRTNode*>::iterator itt;
+	std::list<rw::common::Ptr<RRTNode> >::iterator itt;
 	for (itt = _tree.begin(); itt != _tree.end(); itt++) {
 		tempQ = (*itt)->getValue();
 		if((tempQ - node).norm2() < distanceToNode){
@@ -40,8 +40,8 @@ RRTNode * RRT::getClosestNode(rw::math::Q node) {
 }
 
 
-bool RRT::addNodeToTree(RRTNode * nodeNew) {
-	_tree.push_back(nodeNew);
+bool RRT::addNodeToTree(rw::common::Ptr<RRTNode> newNode) {
+	_tree.push_back(newNode);
 	return !(_tree.empty());
 }
 
