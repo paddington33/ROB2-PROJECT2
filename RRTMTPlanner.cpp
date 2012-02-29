@@ -47,18 +47,78 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	{
 		rw::common::Ptr<RRT> currentTree = chooseTree(NULL);
 		rw::common::Ptr<RRTNode> newNode = extendTreeInRandomDirection(currentTree);
-		rw::common::Ptr<RRTNode> closestNode = closestNodeInAnyOtherTree(currentTree,newNode);
+
+		rw::common::Ptr<RRT> secondTree;
+		rw::common::Ptr<RRTNode> closestNode = closestNodeInAnyOtherTree(secondTree,currentTree,newNode);
 
 		if( ((rw::math::Q)(newNode->getValue() - closestNode->getValue())).norm2() < _d )
-			//Connect somehow
+		{
+			if(!edgeCollisionDetection(closestNode,newNode))
+			{
+				mergeTree(currentTree, secondTree);
+				if(closestNode->getTree() == newNode->getTree())
+					return getPath(closestNode,newNode);
+			}
+		}
 
 		connect(currentTree,newNode,closestNode);
+
+		if(closestNode->getTree() == newNode->getTree())
+			return getPath(closestNode,newNode);
 	}
+
+	return NULL;
+
+}
+
+void RRTMTPlanner::mergeTree(rw::common::Ptr<RRT> firstTree,
+		rw::common::Ptr<RRT> secondTree,
+		rw::common::Ptr<RRTNode> firstNode,
+		rw::common::Ptr<RRTNode> secondNode )
+{
+	firstNode->setParrent(secondNode);
+	rw::common::Ptr<RRTNode> tempNode;
+	while(secondNode != NULL)
+	{
+		tempNode = secondNode;
+		secondNode = secondNode->getParrent();
+		secondNode->setParrent(tempNode);
+	}
+	std::list<rw::common::Ptr<RRTNode> > nodeList = secondTree->getListOfNodes();
+
+	std::list<rw::common::Ptr<RRTNode> >::iterator it;
+
+	for(it = nodeList.begin(); it!=nodeList.end(); ++it)
+		firstTree->addNodeToTree(*it);
+
+	_trees.remove(secondTree);
 
 }
 
 rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree)
 {
+
+	rw::math::Q rndQ = _cFree->sample();
+
+	rw::common::Ptr<RRTNode> tmpNode = new RRTNode();
+	rw::common::Ptr<RRTNode> cloNode = new RRTNode();
+	rw::common::Ptr<RRTNode> newNode = new RRTNode();
+
+	tmpNode->setValue(rndQ);
+	cloNode = currentTree->getClosestNode(rndQ);
+
+	rw::math::Q dirQ = tmpNode->getValue()- cloNode->getValue();
+	rw::math::Q newQ = cloNode->getValue() + dirQ*_epsilon;
+	rw::math::Q stpQ = _epsilon*dirQ/dirQ.norm2();
+
+	newNode->setValue(cloNode->getValue()+stpQ);
+	if(!_constraint->inCollision(newNode->getValue())){
+		currentTree->addNodeToTree(newNode);
+		return newNode;
+	}
+	return NULL;
+
+	return tmpNode;
 
 	rw::math::Q rndQ = _cFree->sample();
 
