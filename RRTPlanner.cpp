@@ -19,6 +19,9 @@
 using namespace rws;
 using namespace rw;
 
+RRTPlanner::RRTPlanner() {
+}
+
 RRTPlanner::RRTPlanner(rws::RobWorkStudio* robWorkStudio) {
 	_robWorkStudio = robWorkStudio;
 }
