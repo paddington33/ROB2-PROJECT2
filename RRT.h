@@ -6,15 +6,8 @@
  */
 #include "RRTNode.h"
 #include <rw/math.hpp>
-<<<<<<< OURS
-=======
 #include <rw/common.hpp>
-
->>>>>>> THEIRS
 #include <limits>
-
-
-
 
 #include <list>
 

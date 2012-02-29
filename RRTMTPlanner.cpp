@@ -12,35 +12,27 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 	_connectN(connectN)
 {
 
+
 	_workcell = robWorkStudio->getWorkcell();
 	_device = _workcell->findDevice("KukaKr16");
 	_cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
 	_collisionDetector = new rw::proximity::CollisionDetector(_workcell, _cdstrategy);
 	_constraint = rw::pathplanning::QConstraint::make(_collisionDetector, _device, _workcell->getDefaultState());
+
+	_cFree = rw::pathplanning::QSampler::makeConstrained(rw::pathplanning::QSampler::makeUniform(_device), _constraint);
+
 }
 
 RRTMTPlanner::~RRTMTPlanner() {
 
 }
 
-void RRTMTPlanner::initTrees()
+void RRTMTPlanner::initTrees(rw::math::Q qInit, rw::math::Q qGoal)
 {
 	_trees.push_back(new RRT(qInit));
 
 	for(int i = 1 ; i < _numberOfTrees -1 ; i++ )
-		_trees.push_back(new RRT(cFree->sample()));
-
-
-	if(_numberOfTrees != 1)
-		_trees.push_back(new RRT(qGoal));
-}
-
-rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
-{
-	_trees.push_back(new RRT(qInit));
-
-	for(int i = 1 ; i < _numberOfTrees -1 ; i++ )
-		_trees.push_back(new RRT(cFree->sample()));
+		_trees.push_back(new RRT(_cFree->sample()));
 
 
 	if(_numberOfTrees != 1)
@@ -65,7 +57,7 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 
 }
 
-rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::Ptr<RRTNode> nodeClose)
+rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree)
 {
 
 }
@@ -75,7 +67,7 @@ bool RRTMTPlanner::edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw
 
 }
 
-rw::common::Ptr<RRTNode> RRTMTPlanner::cloestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree)
+rw::common::Ptr<RRTNode> RRTMTPlanner::cloestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> currentNode)
 {
 
 }
@@ -112,7 +104,7 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 	return reached;
 }
 
-rw::common::Ptr<RRT> RRTMTPlanner::swap(rw::common::Ptr<RRT> currentTree)
+rw::common::Ptr<RRT> RRTMTPlanner::chooseTree(rw::common::Ptr<RRT> currentTree)
 {
 
 }

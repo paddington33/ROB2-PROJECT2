@@ -13,17 +13,17 @@
 
 class RRTNode {
 private:
-	RRTNode* _parrent;
+	rw::common::Ptr<RRTNode> _parrent;
 	rw::math::Q _value;
 public:
 	RRTNode();
-	RRTNode(rw::math::Q value, RRTNode* parrent);
+	RRTNode(rw::math::Q value, rw::common::Ptr<RRTNode> parrent);
 
 
-    RRTNode * getParrent() const;
+    rw::common::Ptr<RRTNode> getParrent() const;
     rw::math::Q getValue() const;
 
-    void setParrent(RRTNode* parrent);
+    void setParrent(rw::common::Ptr<RRTNode> parrent);
     void setValue(rw::math::Q value);
 
 };

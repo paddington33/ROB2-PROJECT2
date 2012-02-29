@@ -14,7 +14,8 @@ RRT::RRT(){
 }
 
 RRT::RRT(rw::math::Q q){
-	_tree.push_back(q);
+
+	_tree.push_back(new RRTNode(q,NULL));
 }
 
 RRT::~RRT() {

@@ -71,7 +71,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	for(int i = 0; i < K ;i++)
 	{
 		rw::math::Q randQ = rw::math::Math::ranQ(device->getBounds());
-		RRTNode* closestNode = currentTree->getClosestNode(randQ);
+		rw::common::Ptr<RRTNode> closestNode = currentTree->getClosestNode(randQ);
 
 		rw::math::Q closestQ = closestNode->getValue();
 
@@ -100,7 +100,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 			newNode->setParrent(closestNode);
 			secondTree->addNodeToTree(newNode);
 
-			RRTNode* closestNodeInTheOtherTree = currentTree->getClosestNode(newQ);
+			rw::common::Ptr<RRTNode> closestNodeInTheOtherTree = currentTree->getClosestNode(newQ);
 
 			rw::math::Q closestQInTheOtherTree = closestNodeInTheOtherTree->getValue();
 
@@ -132,7 +132,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 			}
 			else
 			{
-				RRTNode* iteratorPathNode = closestNodeInTheOtherTree;
+				rw::common::Ptr<RRTNode> iteratorPathNode = closestNodeInTheOtherTree;
 				while(iteratorPathNode != NULL)
 				{
 					path.push_back(iteratorPathNode->getValue());
