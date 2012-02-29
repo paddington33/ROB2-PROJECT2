@@ -98,20 +98,17 @@ void SamplePlugin::initialize() {
 }
 
 void SamplePlugin::stateChangedListener(const State& state) {
-    log().info() << "State changed!";
+
 }
 
 
 void SamplePlugin::clickEvent() {
 
-	std::cout << "We are here1" << std::endl;
-
 	using namespace proximity;
 
 	rws::RobWorkStudio* robWorkStudio = getRobWorkStudio();
 
-
-	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkCell();
+	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkcell();
 	rw::models::Device::Ptr device = workcell->findDevice("KukaKr16");
 
 	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
@@ -122,22 +119,12 @@ void SamplePlugin::clickEvent() {
 
 	QSampler::Ptr cFree = QSampler::makeConstrained(QSampler::makeUniform(device),constraint);
 
-	std::cout << "We are here1.2" << std::endl;
-
 	RRTPlanner* planner = new RRTPlanner(robWorkStudio);
-
-	std::cout << "We are here2" << std::endl;
 
 	rw::math::Q qInit = cFree->sample();
 	rw::math::Q qGoal = cFree->sample();
 
-	std::cout << "We are here2.5" << std::endl;
-
 	std::list<rw::math::Q> path = planner->plan(qInit,qGoal);
-
-	std::cout << "We are here3" << std::endl;
-
-	std::cout << "path length " << path.size() << std::endl;
 
 	rw::trajectory::QPath qpath;// = new rw::trajectory::QPath();
 
@@ -145,7 +132,6 @@ void SamplePlugin::clickEvent() {
 	int i = 0;
 	for(it = path.begin();it != path.end();it++)
 	{
-		std::cout << "addQ( tpath," << (double)(i++)*.01 << "," << *it << " )" <<  std::endl;
 		qpath.push_back(*it);
 	}
 
@@ -155,10 +141,6 @@ void SamplePlugin::clickEvent() {
 	        TimedUtil::makeTimedStatePath(
 	            *workcell,
 	            rw::models::Models::getStatePath(*device, qpath, state)));
-
-
-
-
 
 }
 

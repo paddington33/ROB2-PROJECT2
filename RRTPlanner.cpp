@@ -32,7 +32,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 
 	using namespace proximity;
 
-	rw::common::Ptr<rw::models::WorkCell> workcell = _robWorkStudio->getWorkCell();
+	rw::common::Ptr<rw::models::WorkCell> workcell = _robWorkStudio->getWorkcell();
 	rw::common::Ptr<rw::models::Device> device = workcell->findDevice("KukaKr16");
 
 	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
@@ -41,7 +41,7 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	rw::pathplanning::QConstraint::Ptr constraint = rw::pathplanning::QConstraint::make(
 			collisionDetector, device, workcell->getDefaultState());
 
-	double epsilon = 1e-3;
+	double epsilon = 1e-2;
 
 	RRT* aTree = new RRT();
 
@@ -58,7 +58,6 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	goalNode->setParrent(NULL);
 	bTree->addNodeToTree(goalNode);
 
-
 	RRT* currentTree = aTree;
 	RRT* secondTree = bTree;
 
@@ -66,17 +65,10 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 
 	std::list<rw::math::Q> path;
 
-	std::cout << "RRTPlanner 1" << std::endl;
-
 	for(int i = 0; i < K ;i++)
 	{
-
-		std::cout << "RRTPlanner " << i << std::endl;
-
 		rw::math::Q randQ = rw::math::Math::ranQ(device->getBounds());
 		RRTNode* closestNode = currentTree->getClosestNode(randQ);
-
-		std::cout << "cnit-1 " << closestNode << std::endl;
 
 		rw::math::Q closestQ = closestNode->getValue();
 
@@ -97,22 +89,15 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 			secondTree = bTree;
 		}
 
-
 		if(!constraint->inCollision(newQ))
 		{
-
-			std::cout << "cnit0" << std::endl;
 
 			RRTNode* newNode = new RRTNode();
 			newNode->setValue(newQ);
 			newNode->setParrent(closestNode);
 			secondTree->addNodeToTree(newNode);
 
-			std::cout << "cnit1" << std::endl;
-
 			RRTNode* closestNodeInTheOtherTree = currentTree->getClosestNode(newQ);
-
-			std::cout << "cnit2" << closestNodeInTheOtherTree << std::endl;
 
 			rw::math::Q closestQInTheOtherTree = closestNodeInTheOtherTree->getValue();
 
@@ -129,21 +114,9 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 
 				tempQ += stepQ;
 
-//				std::cout << "NQ" << newQ << std::endl;
-//				std::cout << "CP" << closestQInTheOtherTree << std::endl;
-//				std::cout << "TQ" <<tempQ << std::endl;
-//				std::cout << "SI" << ((rw::math::Q)(closestQInTheOtherTree - tempQ)).norm2() << std::endl;
-//				std::cout << reached << std::endl;
-
-//				if(constraint->inCollision(tempQ))
-//					std::cout << "COL" << std::endl;
-//				else
-//					std::cout << "slet ike CoL" << std::endl;
-
-
 			} while(!constraint->inCollision(tempQ) && !reached);
 
-
+			tempQ -= stepQ;
 
 
 			if(!reached)
@@ -161,8 +134,6 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 				{
 					path.push_back(iteratorPathNode->getValue());
 					iteratorPathNode = iteratorPathNode->getParrent();
-
-					std::cout << "Næ jeg er faktisk her" << std::endl;
 				}
 
 				iteratorPathNode = newNode;
@@ -170,8 +141,6 @@ std::list<rw::math::Q> RRTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 				{
 					path.push_front(iteratorPathNode->getValue());
 					iteratorPathNode = iteratorPathNode->getParrent();
-
-					std::cout << "Næ jeg er her" << std::endl;
 				}
 				return path;
 			}
