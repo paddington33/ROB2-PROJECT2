@@ -5,6 +5,7 @@
  *      Author: daniel test
  */
 #include "RRTNode.h"
+#include <rw/math.hpp>
 #include <limits>
 
 
@@ -19,6 +20,7 @@ private:
 	std::list<RRTNode *> _tree;
 public:
 	RRT();
+	RRT(rw::math::Q q);
 	virtual ~RRT();
 
 	bool addNodeToTree(RRTNode * nodeNew);

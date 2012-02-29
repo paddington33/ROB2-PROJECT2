@@ -16,6 +16,7 @@ class RRTPlanner {
 private:
 	rws::RobWorkStudio* _robWorkStudio;
 public:
+	RRTPlanner();
 	RRTPlanner(rws::RobWorkStudio* robWorkStudio);
 	virtual ~RRTPlanner();
 	std::list<rw::math::Q> plan(rw::math::Q qInit, rw::math::Q qGoal);
