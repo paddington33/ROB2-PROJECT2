@@ -11,11 +11,14 @@
 
 
 RRT::RRT(){
-	// TODO Auto-generated constructor stub
+}
+
+RRT::RRT(rw::math::Q q){
+	_tree.push_back(q);
 }
 
 RRT::~RRT() {
-	// TODO Auto-generated destructor stub
+
 }
 
 RRTNode * RRT::getClosestNode(rw::math::Q node) {
