@@ -23,13 +23,20 @@ public:
 
 private slots:
     void clickEvent();
+    void clickEventRRT();
+
+    void loadScene(std::string scene);
 
     void stateChangedListener(const rw::kinematics::State& state);
 
 private:
-    QPushButton* _btn0,*_btn1,*_btn2,*_btn3,*_btn4;
-    QSpinBox* _box0;
+    QComboBox* _combobox0;
+    QPushButton* _btn0,*_btn1,*_btn3,*_btn4;
+    QSpinBox* _box0,* _box2,* _box3;
+    QDoubleSpinBox* _box1;
     QProgressBar* _bar0;
+    QLabel* _label0,* _label1,* _label2,* _label3,* _label4,* _label5,* _label6,* _label7;
+    QCheckBox* _checkbox0,* _checkbox1,* _checkbox2,* _checkbox3;
 };
 
 #endif /*SAMPLEPLUGIN_HPP*/
