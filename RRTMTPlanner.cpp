@@ -69,8 +69,15 @@ bool RRTMTPlanner::edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw
 
 rw::common::Ptr<RRTNode> RRTMTPlanner::cloestNodeInAnyOtherTree(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> currentNode)
 {
+	RRTNode * inewNode = NULL;
+
+	_trees.size()
+
+	for()
 
 }
+
+
 
 bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> newNode, rw::common::Ptr<RRTNode> closestNode)
 {
@@ -83,23 +90,19 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 
 	bool reached = false;
 
-	if(!_constraint->inCollision(closestNode->getValue()))
-	{
+	do {
+		if (((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon)
+			reached = true;
+		tmpQ += stpQ;
+	} while (!_constraint->inCollision(tmpQ) && !reached);
 
-		do {
-			if (((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon)
-				reached = true;
-			tmpQ += stpQ;
-		} while (!_constraint->inCollision(tmpQ) && !reached);
+	tmpQ -= stpQ;
 
-		tmpQ -= stpQ;
-
-		RRTNode* inewNode;
-		inewNode = new RRTNode();
-		inewNode->setValue(tmpQ);
-		inewNode->setParrent(newNode.get());
-		currentTree->addNodeToTree(inewNode);
-	}
+	RRTNode* inewNode;
+	inewNode = new RRTNode();
+	inewNode->setValue(tmpQ);
+	inewNode->setParrent(newNode.get());
+	currentTree->addNodeToTree(inewNode);
 
 	return reached;
 }
