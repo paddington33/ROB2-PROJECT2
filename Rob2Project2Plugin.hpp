@@ -30,7 +30,7 @@ private slots:
 
 
 
-    void loadScene(std::string scene);
+    void loadScene(std::string scene, std::string deviceName);
 
     void stateChangedListener(const rw::kinematics::State& state);
 

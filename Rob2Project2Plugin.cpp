@@ -188,12 +188,12 @@ void SamplePlugin::stateChangedListener(const State& state) {
 }
 
 
-void SamplePlugin::loadScene(std::string scene)
+void SamplePlugin::loadScene(std::string scene,std::string deviceName)
 {
 	WorkCell::Ptr workCell = WorkCellLoader::load(scene);
 	std::cout	<< "Workcell " << *workCell << "successfully loaded." << std::endl;
-	RobWorkStudio* robWorkStudio = getRobWorkStudio();
-	robWorkStudio->setWorkcell(workCell);
+	_robWorkStudio->setWorkcell(workCell);
+	_planner->setWorkCell(deviceName);
 }
 
 
@@ -202,9 +202,9 @@ void SamplePlugin::clickEvent() {
 
 	QObject *obj = sender();
 	if(obj == _btn3){
-		loadScene("PA10InGantry/Scene.wc.xml");
+		loadScene("PA10InGantry/Scene.wc.xml","PA10");
 	} else if(obj == _btn1){
-		loadScene("KukaKr16/Scene.wc.xml");
+		loadScene("KukaKr16/Scene.wc.xml","KukaKr16");
 	} else if(obj == _btn0){	//Run scene
 		clickEventRRT();
 	} else if(obj == _btn4){
