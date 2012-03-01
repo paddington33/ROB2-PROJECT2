@@ -15,7 +15,7 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 	std::cout << "RRT 1" << std::endl;
 	_workcell = robWorkStudio->getWorkcell();
 	std::cout << "RRT 2" << std::endl;
-	_device = _workcell->findDevice("PA10");
+	_device = _workcell->findDevice("KukaKr16");
 	std::cout << "RRT 3" << std::endl;
 	_cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
 	std::cout << "RRT 4" << std::endl;
