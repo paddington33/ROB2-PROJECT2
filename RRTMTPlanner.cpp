@@ -59,7 +59,7 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	//Number of tries to find a path
 	int K = 10000;
 
-	//Reference to node to extend to in ran dir
+	//Reference to node to extend to in ran diri
 	rw::common::Ptr<RRTNode> newNode;
 
 	for(int i = 0;i < K; i++ )
