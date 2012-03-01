@@ -255,6 +255,7 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::closestNodeInAnyOtherTree(rw::common::Ptr
 
 bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> newNode, rw::common::Ptr<RRTNode> closestNode)
 {
+
 	assert(_epsilon);
 
 	rw::math::Q dirQ = closestNode->getValue()-newNode->getValue();
@@ -262,11 +263,17 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 	rw::math::Q tmpQ = newNode->getValue();
 
 	rw::common::Ptr<RRTNode> inewNode;
+	rw::common::Ptr<RRTNode> inewOldNode = new RRTNode();
 	inewNode = new RRTNode();
 
 	int testCount = 0;
 	bool reached = false;
 	bool edgeInCollition = false;
+	bool confInCollition = false;
+
+
+	rw::common::Timer timerPlanner;
+	rw::common::Timer timer2Planner;
 
 	double oldDist = 0;
 	double distance = (closestNode->getValue() - tmpQ).norm2();
@@ -274,21 +281,32 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 	do {
 
 		testCount++;
-
+		timer2Planner.resume();
 		if ((((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon))
 			reached = true;
 
 		tmpQ += stpQ;
+		inewOldNode->setValue(inewNode->getValue());
 		inewNode->setValue(tmpQ);
+		timer2Planner.pause();
 
-		edgeInCollition = edgeCollisionDetection(inewNode,newNode);
+		timerPlanner.resume();
+			if (_edgeDetection || testCount != 1){
+				edgeInCollition = edgeCollisionDetection(inewNode,inewOldNode);
+			} else if (_edgeDetection) {
+				edgeInCollition = edgeCollisionDetection(inewNode,newNode);
+			}
+		timerPlanner.pause();
 
-	} while (!_constraint->inCollision(tmpQ) && !reached && !edgeInCollition );
+		confInCollition = _constraint->inCollision(tmpQ);
+
+
+	} while (!confInCollition && !reached && !edgeInCollition );
 
 
 
 
-	if(_constraint->inCollision(tmpQ) || edgeInCollition){
+	if(confInCollition || edgeInCollition){
 
 		if(testCount > _connectN){
 			inewNode->setValue(tmpQ - _connectN*stpQ);
@@ -304,6 +322,7 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 	currentTree->addNodeToTree(inewNode);
 	newNode = inewNode;
 
+	//std::cout << "Timers: " << timerPlanner.getTime() << " " << timer2Planner.getTime() << std::endl;
 
 	return reached;
 }

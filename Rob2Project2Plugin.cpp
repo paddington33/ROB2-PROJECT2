@@ -174,6 +174,9 @@ void SamplePlugin::initialize() {
     ((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
     ((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
 	((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
+	((RRTMTPlanner*)_planner)->setPearls(_checkbox1->isChecked());
+	((RRTMTPlanner*)_planner)->setedgeDetection(_checkbox0->isChecked());
+
 	_numberOfRuns = 100;
 }
 
@@ -242,17 +245,25 @@ void SamplePlugin::runNplanners(){
 
 	common::Timer timerPlanner;
 
-	std::cout << "1" << std::endl;
 
-	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
+	for(int i = 0 ; i < _numberOfRuns ; i++ ) {
 
-	std::cout << "2" << std::endl;
+		_planner = new RRTMTPlanner(_robWorkStudio);
 
-	for(int i = 1 ; i < _numberOfRuns ; i++ ) {
+		_planner->setWorkCell(_robWorkStudio->getWorkcell()->getDevices().at(0)->getName());
+
+		((RRTMTPlanner*)_planner)->setConnectN(_box3->value());
+		((RRTMTPlanner*)_planner)->setSwapStrategy(_combobox0->currentIndex());
+		((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
+		((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
+		((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
+		((RRTMTPlanner*)_planner)->setPearls(_checkbox1->isChecked());
+		((RRTMTPlanner*)_planner)->setedgeDetection(_checkbox0->isChecked());
+
 		timerPlanner.resume();
-//		rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
+		rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
 		timerPlanner.pause();
-		std::cout << "pathLength " << i << " " << std::endl; // path.size() << std::endl;
+		std::cout << "pathLength " << i << " : " << path.size() << " " << std::endl; // path.size() << std::endl;
 
 		//increase progressbar
 		_bar0 -> setValue(i+1);
@@ -267,20 +278,33 @@ void SamplePlugin::clickEventRRT() {
 
 	using namespace proximity;
 
-	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
+	rw::models::Device::Ptr device;
+	rw::kinematics::State state;
+	rw::trajectory::QPath path;
 
-	rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
+		_planner = new RRTMTPlanner(_robWorkStudio);
 
-	rw::kinematics::State state = _robWorkStudio->getWorkCell()->getDefaultState();
+		((RRTMTPlanner*)_planner)->setConnectN(_box3->value());
+		((RRTMTPlanner*)_planner)->setSwapStrategy(_combobox0->currentIndex());
+		((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
+		((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
+		((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
+		((RRTMTPlanner*)_planner)->setPearls(_checkbox1->isChecked());
+		((RRTMTPlanner*)_planner)->setedgeDetection(_checkbox0->isChecked());
 
-	rw::models::Device::Ptr device = _robWorkStudio->getWorkCell()->getDevices().at(0);
 
-	std::cout << "pathLength " << path.size() << std::endl;
+		_planner->setWorkCell(_robWorkStudio->getWorkcell()->getDevices().at(0)->getName());
 
-	_robWorkStudio->setTimedStatePath(
-	        TimedUtil::makeTimedStatePath(
-	            *_robWorkStudio->getWorkCell(),
-	            rw::models::Models::getStatePath(*device, path, state)));
+		path = ((RRTMTPlanner*)_planner)->plan();
+
+		state = _robWorkStudio->getWorkcell()->getDefaultState();
+
+		device = _robWorkStudio->getWorkcell()->getDevices().at(0);
+
+		std::cout << "pathLength " << path.size() << std::endl;
+
+	_robWorkStudio->setTimedStatePath(TimedUtil::makeTimedStatePath(*_robWorkStudio->getWorkcell(),rw::models::Models::getStatePath(*device, path, state)));
+
 }
 
 Q_EXPORT_PLUGIN(SamplePlugin);

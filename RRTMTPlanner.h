@@ -21,7 +21,7 @@
 #include <rw/pathplanning/QSampler.hpp>
 
 
-
+USE_ROBWORK_NAMESPACE
 
 class RRTMTPlanner: public RRTPlanner {
 private:
