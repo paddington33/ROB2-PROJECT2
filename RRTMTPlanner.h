@@ -41,6 +41,9 @@ private:
 	double _d; //Min distance to test connection
 	int _numberOfTrees;
 
+	bool _edgeDetection;
+	bool _pearls;
+
 public:
 	RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN = -1);
 	void setWorkCell(std::string deviceName);
@@ -59,6 +62,8 @@ public:
     void setMinDis(double minDis);
     void setNumberOfTree(int nrOfTree);
     void setSwapStrategy(int ss);
+    void setedgeDetection(bool edgeDetection);
+    void setPearls(bool pearls);
 	virtual ~RRTMTPlanner();
 };
 

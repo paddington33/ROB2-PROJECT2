@@ -252,25 +252,11 @@ void SamplePlugin::clickEventRRT() {
 
 	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
 
-	std::cout << " 1 " << std::endl;
-
-//	((RRTMTPlanner*)_planner)->setEpsilon(.1);
-//	((RRTMTPlanner*)_planner)->setMinDis(.05);
-//	((RRTMTPlanner*)_planner)->setNumberOfTree(2);
-
-	std::cout << " 2 " << std::endl;
-
 	rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
-
-	std::cout << " 3 " << std::endl;
 
 	rw::kinematics::State state = _robWorkStudio->getWorkCell()->getDefaultState();
 
-	std::cout << " 4 " << std::endl;
-
 	rw::models::Device::Ptr device = _robWorkStudio->getWorkCell()->getDevices().at(0);
-
-	std::cout << " 5 " << std::endl;
 
 	std::cout << "pathLength " << path.size() << std::endl;
 

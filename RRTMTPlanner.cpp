@@ -330,3 +330,14 @@ void RRTMTPlanner::setSwapStrategy(int ss)
     _swapStrategy = ss;
 }
 
+void RRTMTPlanner::setedgeDetection(bool edgeDetection)
+{
+	_edgeDetection = edgeDetection;
+}
+
+void RRTMTPlanner::setPearls(bool pearls)
+{
+	_pearls = pearls;
+}
+
+
