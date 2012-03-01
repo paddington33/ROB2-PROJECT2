@@ -27,7 +27,7 @@ public:
 private slots:
     void clickEvent();
     void clickEventRRT();
-
+    void runNplanners();
 
 
     void loadScene(std::string scene, std::string deviceName);
@@ -44,7 +44,7 @@ private:
     QDoubleSpinBox* _box1,* _box4;
     QProgressBar* _bar0;
     QLabel* _label0,* _label1,* _label2,* _label3,* _label4,* _label5,* _label6,* _label7,* _label8;
-    QCheckBox* _checkbox0,* _checkbox1,* _checkbox2,* _checkbox3;
+    QCheckBox* _checkbox0,* _checkbox1,* _checkbox3;
 };
 
 #endif /*SAMPLEPLUGIN_HPP*/

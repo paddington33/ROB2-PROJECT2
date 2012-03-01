@@ -87,13 +87,6 @@ SamplePlugin::SamplePlugin():
     _label0 = new QLabel("Edge Detection");
     pLayout->addWidget(_label0,row++,0);
 
-
-    _checkbox2 = new QCheckBox();
-    pLayout->addWidget(_checkbox2,row,1);
-    connect(_checkbox2, SIGNAL(clicked()), this, SLOT(clickEvent()));
-    _label2 = new QLabel("Weighted joints");
-    pLayout->addWidget(_label2,row++,0);
-
     _label7 = new QLabel("Connect");
     pLayout->addWidget(_label7,row++,0);
 
@@ -209,7 +202,7 @@ void SamplePlugin::clickEvent() {
 		clickEventRRT();
 	} else if(obj == _btn4){
 		//run many planner
-
+		runNplanners();
 	} else if(obj == _box0){
 		//nr of runs spinbox
 		_numberOfRuns = (_box0 -> value());
@@ -217,16 +210,15 @@ void SamplePlugin::clickEvent() {
 //		std::cout << _numberOfRuns << std::endl;
 	} else if(obj == _checkbox0){
 		//edge CD
-
-	} else if(obj == _checkbox2){
-		//weighted joint
-
+		((RRTMTPlanner*)_planner)->setedgeDetection(_checkbox0->isChecked());
+//		std::cout<< _checkbox0->isChecked() << std::endl;
 	} else if(obj == _box3){
 		//connectN
 		((RRTMTPlanner*)_planner)->setConnectN(_box3->value());
 	} else if(obj == _checkbox1){
 		//connect pearl mode
-
+		((RRTMTPlanner*)_planner)->setPearls(_checkbox1->isChecked());
+//		std::cout<< _checkbox1->isChecked() << std::endl;
 	} else if(obj == _combobox0){
 		//swap strategi
 		((RRTMTPlanner*)_planner)->setSwapStrategy(_combobox0->currentIndex());
@@ -244,6 +236,16 @@ void SamplePlugin::clickEvent() {
 
 
 }
+
+void SamplePlugin::runNplanners(){
+
+	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
+
+	for(int i = 1 ; i < _numberOfRuns ; i++ ) {
+		rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
+	}
+}
+
 
 
 void SamplePlugin::clickEventRRT() {
