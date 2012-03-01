@@ -46,14 +46,14 @@ SamplePlugin::SamplePlugin():
     RobWorkStudioPlugin("SamplePluginName", QIcon(":/pa_icon.png"))
 {
 
-	std::cout << "1" << std::endl;
+//	std::cout << "1" << std::endl;
 
 	//create planner
 	_robWorkStudio = getRobWorkStudio();
 
-	std::cout << "2" << std::endl;
+//	std::cout << "2" << std::endl;
 
-	std::cout << "3" << std::endl;
+//	std::cout << "3" << std::endl;
 
     QWidget* base = new QWidget(this);
     QGridLayout* pLayout = new QGridLayout(base);
@@ -71,13 +71,13 @@ SamplePlugin::SamplePlugin():
     connect(_btn4, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
     _bar0 = new QProgressBar();
- 	_bar0 -> setMaximum(edges);
+ 	_bar0 -> setMaximum(100);
      _bar0 -> setValue(0);
      pLayout->addWidget(_bar0,row++,0);
 
     _box0 = new QSpinBox();
     _box0 -> setRange(0,10000000);
-    _box0 -> setValue(edges);
+    _box0 -> setValue(100);
     pLayout->addWidget(_box0, row++, 0);
     connect(_box0, SIGNAL(valueChanged(int)), this, SLOT(clickEvent()));
 
@@ -114,7 +114,7 @@ SamplePlugin::SamplePlugin():
 
     _combobox0 = new QComboBox();
     pLayout->addWidget(_combobox0,row++,0);
-
+    connect(_combobox0, SIGNAL(activated(int)), this, SLOT(clickEvent()));
 
     _combobox0 -> addItem("Loop");
     _combobox0 -> addItem("Random");
@@ -140,6 +140,17 @@ SamplePlugin::SamplePlugin():
     connect(_box1, SIGNAL(valueChanged(double)), this, SLOT(clickEvent()));
 
 
+    _label8 = new QLabel("Min. Distance");
+    pLayout->addWidget(_label8,row++,0);
+    _box4 = new QDoubleSpinBox();
+    _box4 -> setDecimals(4);
+    _box4 -> setSingleStep(0.0001);
+    _box4 -> setRange(0.0001,10);
+    _box4 -> setValue(0.05);
+    pLayout->addWidget(_box4, row++, 0);
+    connect(_box4, SIGNAL(valueChanged(double)), this, SLOT(clickEvent()));
+
+
     _btn1 = new QPushButton("Load Kuka scene");
     pLayout->addWidget(_btn1, row++, 0);
     connect(_btn1, SIGNAL(clicked()), this, SLOT(clickEvent()));
@@ -162,7 +173,14 @@ void SamplePlugin::initialize() {
 	_robWorkStudio = getRobWorkStudio();
 	_robWorkStudio->stateChangedEvent().add(
             boost::bind(&SamplePlugin::stateChangedListener, this, _1), this);
-    _planner = new RRTMTPlanner(_robWorkStudio);
+
+	_planner = new RRTMTPlanner(_robWorkStudio);
+
+    ((RRTMTPlanner*)_planner)->setConnectN(_box3->value());
+    ((RRTMTPlanner*)_planner)->setSwapStrategy(_combobox0->currentIndex());
+    ((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
+    ((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
+	((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
 }
 
 void SamplePlugin::stateChangedListener(const State& state) {
@@ -180,38 +198,52 @@ void SamplePlugin::loadScene(std::string scene)
 
 
 void SamplePlugin::clickEvent() {
+	std::cout << "click Event" << std::endl;
 
 	QObject *obj = sender();
 	if(obj == _btn3){
 		loadScene("PA10InGantry/Scene.wc.xml");
 	} else if(obj == _btn1){
 		loadScene("KukaKr16/Scene.wc.xml");
-		_planner = new RRTMTPlanner(_robWorkStudio);
 	} else if(obj == _btn0){	//Run scene
 		clickEventRRT();
 	} else if(obj == _btn4){
 		//run many planner
+
 	} else if(obj == _box0){
 		//nr of runs spinbox
+		_numberOfRuns = (_box0 -> value());
+		_bar0->setMaximum(_numberOfRuns);
+//		std::cout << _numberOfRuns << std::endl;
 	} else if(obj == _checkbox0){
 		//edge CD
+
 	} else if(obj == _checkbox2){
 		//weighted joint
+
 	} else if(obj == _box3){
 		//connectN
+		((RRTMTPlanner*)_planner)->setConnectN(_box3->value());
 	} else if(obj == _checkbox1){
 		//connect pearl mode
+
 	} else if(obj == _combobox0){
 		//swap strategi
+		((RRTMTPlanner*)_planner)->setSwapStrategy(_combobox0->currentIndex());
+//		std::cout << _combobox0->currentIndex() << std::endl;
 	} else if(obj == _box2){
 		//nr of tree
+		((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
 	} else if(obj == _box1){
 		//epsilon
+		((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
+	} else if(obj == _box4){
+		//min dis
+		((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
 	}
 
 
 }
-
 
 
 void SamplePlugin::clickEventRRT() {
@@ -222,9 +254,9 @@ void SamplePlugin::clickEventRRT() {
 
 	std::cout << " 1 " << std::endl;
 
-	((RRTMTPlanner*)_planner)->setEpsilon(.1);
-	((RRTMTPlanner*)_planner)->setMinDis(.05);
-	((RRTMTPlanner*)_planner)->setNumberOfTree(2);
+//	((RRTMTPlanner*)_planner)->setEpsilon(.1);
+//	((RRTMTPlanner*)_planner)->setMinDis(.05);
+//	((RRTMTPlanner*)_planner)->setNumberOfTree(2);
 
 	std::cout << " 2 " << std::endl;
 
