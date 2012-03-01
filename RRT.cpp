@@ -14,8 +14,7 @@ RRT::RRT(){
 }
 
 RRT::RRT(rw::common::Ptr<RRTNode> node){
-
-	_tree.push_back(node);
+	addNodeToTree(node);
 }
 
 RRT::~RRT() {

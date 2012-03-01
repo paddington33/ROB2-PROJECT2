@@ -66,16 +66,19 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	{
 		//Instead of swap tree, allow different strategies
 		rw::common::Ptr<RRT> currentTree = chooseTree(NULL);
-
 		do
 		{
 			//Extend current tree in random direction
 			newNode = extendTreeInRandomDirection(currentTree);
 		} while(!newNode);
 
+
 		//Reference to the tree to which the planner tries to connect
 		rw::common::Ptr<RRT> secondTree;
-		rw::common::Ptr<RRTNode> closestNode = closestNodeInAnyOtherTree(secondTree,currentTree,newNode);
+		rw::common::Ptr<RRTNode> closestNode;
+
+
+		closestNode = closestNodeInAnyOtherTree(secondTree,currentTree,newNode);
 
 
 		//If node in current tree and the close node in the other tree is within a distance d
@@ -91,11 +94,13 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 					return getPath(closestNode,newNode);
 			}
 		}
+		if(connect(currentTree,newNode,closestNode)){
 
 		//Connect towards close node in any other tree
 		if(connect(currentTree,newNode,closestNode))
 			//If possible to connect to trees then merge them into one
 			mergeTree(currentTree, secondTree, newNode, closestNode);
+		}
 
 		//If goal and init nodes are in same tree then return the path between them.
 		if(closestNode->getTree() == newNode->getTree())
@@ -139,7 +144,8 @@ void RRTMTPlanner::mergeTree(rw::common::Ptr<RRT> firstTree,
 
 rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree)
 {
-	rw::math::Q rndQ = _cFree->sample();
+
+	rw::math::Q rndQ = rw::math::Math::ranQ(_device->getBounds());
 
 	rw::common::Ptr<RRTNode> tmpNode = new RRTNode();
 	rw::common::Ptr<RRTNode> cloNode = new RRTNode();
@@ -149,13 +155,12 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::P
 
 	cloNode = currentTree->getClosestNode(rndQ);
 
-	rw::math::Q dirQ = tmpNode->getValue()- cloNode->getValue();
+	rw::math::Q dirQ = tmpNode->getValue()-cloNode->getValue();
 	rw::math::Q newQ = cloNode->getValue() + dirQ*_epsilon;
-	rw::math::Q stpQ = _epsilon*dirQ/dirQ.norm2();
 
-	newNode->setValue(cloNode->getValue()+stpQ);
-	if(!_constraint->inCollision(newNode->getValue())){
+	if(!_constraint->inCollision(newQ)){
 
+		newNode->setValue(newQ);
 		newNode->setParrent(cloNode);
 		currentTree->addNodeToTree(newNode);
 
@@ -203,10 +208,10 @@ bool RRTMTPlanner::edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw
 			if( ((j - 1/2)*qStep).norm2() <= normDeltaQ )
 				//Return false if any configuration along the edge is in collision
 				if(_constraint->inCollision(qTemp))
-					return false;
+					return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 rw::common::Ptr<RRTNode> RRTMTPlanner::closestNodeInAnyOtherTree(rw::common::Ptr<RRT> &secondTree, rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRTNode> currentNode)
@@ -223,14 +228,18 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::closestNodeInAnyOtherTree(rw::common::Ptr
 
 	//Loop throug all trees
 	for(it = _trees.begin(); it!=_trees.end(); ++it){
-		tmpNode = ((*it)->getClosestNode(currentNode->getValue()));
 
-		if(bstNode == NULL){
-			bstNode = tmpNode;
-		//If distance between nodes is less than the shortest distance so far -> update
-		}else if(((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2() < distanceToNode){
-			distanceToNode = ((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2();
-			bstNode = tmpNode;
+		if(*it != currentTree){
+			tmpNode = ((*it)->getClosestNode(currentNode->getValue()));
+
+			if(bstNode == NULL){
+				bstNode = tmpNode;
+			//If distance between nodes is less than the shortest distance so far -> update
+			}else if(((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2() < distanceToNode){
+				distanceToNode = ((rw::math::Q)bstNode->getValue() - tmpNode->getValue()).norm2();
+				bstNode = tmpNode;
+			}
+
 		}
 	}
 
@@ -248,29 +257,53 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 {
 	assert(_epsilon);
 
-	rw::math::Q dirQ = newNode->getValue() - closestNode->getValue();
-	rw::math::Q newQ = closestNode->getValue() + dirQ*_epsilon;
+	rw::math::Q dirQ = closestNode->getValue()-newNode->getValue();
 	rw::math::Q stpQ = _epsilon*dirQ/dirQ.norm2();
-	rw::math::Q tmpQ = newQ;
-
-	bool reached = false;
-	do {
-
-		if (((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon)
-			reached = true;
-		tmpQ += stpQ;
-	} while (!_constraint->inCollision(tmpQ) && !reached);
-
-	tmpQ -= stpQ;
+	rw::math::Q tmpQ = newNode->getValue();
 
 	rw::common::Ptr<RRTNode> inewNode;
 	inewNode = new RRTNode();
-	inewNode->setValue(tmpQ);
+
+	int testCount = 0;
+	bool reached = false;
+	bool edgeInCollition = false;
+
+	double oldDist = 0;
+	double distance = (closestNode->getValue() - tmpQ).norm2();
+
+	do {
+
+		testCount++;
+
+		if ((((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon))
+			reached = true;
+
+		tmpQ += stpQ;
+		inewNode->setValue(tmpQ);
+
+		edgeInCollition = edgeCollisionDetection(inewNode,newNode);
+
+	} while (!_constraint->inCollision(tmpQ) && !reached && !edgeInCollition );
+
+
+
+
+	if(_constraint->inCollision(tmpQ) || edgeInCollition){
+
+		if(testCount > _connectN){
+			inewNode->setValue(tmpQ - _connectN*stpQ);
+		}else if(_connectN > 0){
+			inewNode->setValue(tmpQ - (testCount/2)*stpQ);
+		}else{
+			inewNode->setValue(tmpQ - stpQ);
+		}
+
+	}
 
 	inewNode->setParrent(newNode);
 	currentTree->addNodeToTree(inewNode);
-
 	newNode = inewNode;
+
 
 	return reached;
 }
@@ -291,7 +324,7 @@ rw::trajectory::QPath RRTMTPlanner::getPath(rw::common::Ptr<RRTNode> initNode,rw
 	//The remaining might be aligned such that getParent is pointing from init to goal or opposite
 	if(initNode->getParrent() == NULL)
 	{
-		while(goalNode->getParrent() != initNode)
+		while(goalNode->getParrent() != NULL)
 		{
 			path.push_back(goalNode->getValue());
 			goalNode = goalNode->getParrent();
@@ -299,7 +332,7 @@ rw::trajectory::QPath RRTMTPlanner::getPath(rw::common::Ptr<RRTNode> initNode,rw
 	}
 	else
 	{
-		while(initNode->getParrent() != goalNode)
+		while(initNode->getParrent() != NULL)
 		{
 			path.push_back(initNode->getValue());
 			initNode = initNode->getParrent();
