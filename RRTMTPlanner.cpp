@@ -271,12 +271,8 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 	bool edgeInCollition = false;
 	bool confInCollition = false;
 
-
 	rw::common::Timer timerPlanner;
 	rw::common::Timer timer2Planner;
-
-	double oldDist = 0;
-	double distance = (closestNode->getValue() - tmpQ).norm2();
 
 	do {
 
@@ -285,9 +281,11 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 		if ((((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon))
 			reached = true;
 
+
+		inewOldNode->setValue(tmpQ);
 		tmpQ += stpQ;
-		inewOldNode->setValue(inewNode->getValue());
 		inewNode->setValue(tmpQ);
+
 		timer2Planner.pause();
 
 		timerPlanner.resume();
