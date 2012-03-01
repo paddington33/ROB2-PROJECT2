@@ -13,7 +13,7 @@
 #include "rws/RobWorkStudio.hpp"
 
 class RRTPlanner {
-private:
+protected:
 	rws::RobWorkStudio* _robWorkStudio;
 public:
 	RRTPlanner();

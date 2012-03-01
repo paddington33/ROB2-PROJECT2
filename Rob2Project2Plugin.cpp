@@ -159,8 +159,10 @@ void SamplePlugin::close() { /* do something when the workcell is closed */}
 
 void SamplePlugin::initialize() {
     /* do something when plugin is initialized */
-    getRobWorkStudio()->stateChangedEvent().add(
+	_robWorkStudio = getRobWorkStudio();
+	_robWorkStudio->stateChangedEvent().add(
             boost::bind(&SamplePlugin::stateChangedListener, this, _1), this);
+    _planner = new RRTMTPlanner(_robWorkStudio);
 }
 
 void SamplePlugin::stateChangedListener(const State& state) {
@@ -185,7 +187,7 @@ void SamplePlugin::clickEvent() {
 	} else if(obj == _btn1){
 		loadScene("KukaKr16/Scene.wc.xml");
 		_planner = new RRTMTPlanner(_robWorkStudio);
-	} else if(obj == _btn0){
+	} else if(obj == _btn0){	//Run scene
 		clickEventRRT();
 	} else if(obj == _btn4){
 		//run many planner
@@ -216,35 +218,33 @@ void SamplePlugin::clickEventRRT() {
 
 	using namespace proximity;
 
-	rws::RobWorkStudio* robWorkStudio = getRobWorkStudio();
+	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
 
-	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkcell();
-	rw::models::Device::Ptr device = workcell->findDevice("KukaKr16");
+	std::cout << " 1 " << std::endl;
 
-	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
-	CollisionDetector::Ptr collisionDetector = new CollisionDetector(workcell, cdstrategy);
+	((RRTMTPlanner*)_planner)->setEpsilon(.1);
+	((RRTMTPlanner*)_planner)->setMinDis(.05);
+	((RRTMTPlanner*)_planner)->setNumberOfTree(2);
 
-	rw::pathplanning::QConstraint::Ptr constraint = rw::pathplanning::QConstraint::make(
-			collisionDetector, device, workcell->getDefaultState());
+	std::cout << " 2 " << std::endl;
 
-	QSampler::Ptr cFree = QSampler::makeConstrained(QSampler::makeUniform(device),constraint);
+	rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
 
-	RRTPlanner* planner = new RRTMTPlanner(robWorkStudio);
-	((RRTMTPlanner*)planner)->setEpsilon(.1);
-	((RRTMTPlanner*)planner)->setMinDis(.05);
-	((RRTMTPlanner*)planner)->setNumberOfTree(2);
+	std::cout << " 3 " << std::endl;
 
-	rw::math::Q qInit = cFree->sample();
-	rw::math::Q qGoal = cFree->sample();
+	rw::kinematics::State state = _robWorkStudio->getWorkCell()->getDefaultState();
 
-	rw::trajectory::QPath path = ((RRTMTPlanner*)planner)->plan(qInit,qGoal);
-	rw::kinematics::State state = workcell->getDefaultState();
+	std::cout << " 4 " << std::endl;
+
+	rw::models::Device::Ptr device = _robWorkStudio->getWorkCell()->getDevices().at(0);
+
+	std::cout << " 5 " << std::endl;
 
 	std::cout << "pathLength " << path.size() << std::endl;
 
-	robWorkStudio->setTimedStatePath(
+	_robWorkStudio->setTimedStatePath(
 	        TimedUtil::makeTimedStatePath(
-	            *workcell,
+	            *_robWorkStudio->getWorkCell(),
 	            rw::models::Models::getStatePath(*device, path, state)));
 }
 

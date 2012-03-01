@@ -11,8 +11,13 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 	RRTPlanner(robWorkStudio) ,
 	_connectN(connectN)				//Number of steps towards closest node in any other tree
 {
-	_workcell = robWorkStudio->getWorkcell();
-	_device = _workcell->findDevice("KukaKr16");
+
+}
+
+void RRTMTPlanner::setWorkCell(std::string deviceName)
+{
+	_workcell = _robWorkStudio->getWorkcell();
+	_device = _workcell->findDevice(deviceName);
 	_cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
 	_collisionDetector = new rw::proximity::CollisionDetector(_workcell, _cdstrategy);
 	_constraint = rw::pathplanning::QConstraint::make(_collisionDetector, _device, _workcell->getDefaultState());
@@ -36,6 +41,11 @@ void RRTMTPlanner::initTrees(rw::common::Ptr<RRTNode> initNode, rw::common::Ptr<
 	//If more than one tree add a tree with goal configuration as root node
 	if(_numberOfTrees != 1)
 		_trees.push_back(new RRT(goalNode));
+}
+
+rw::trajectory::QPath RRTMTPlanner::plan()
+{
+	return plan(_cFree->sample(),_cFree->sample());
 }
 
 rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
@@ -93,7 +103,7 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 	}
 
 	//If not possible to find path return an empty Qpath
-	return new rw::trajectory::QPath();
+	return NULL;
 }
 
 void RRTMTPlanner::mergeTree(rw::common::Ptr<RRT> firstTree,

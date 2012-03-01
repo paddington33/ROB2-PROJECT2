@@ -43,8 +43,10 @@ private:
 
 public:
 	RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN = -1);
+	void setWorkCell(std::string deviceName);
 	void initTrees(rw::common::Ptr<RRTNode> initNode, rw::common::Ptr<RRTNode> goalNode);
 	rw::trajectory::QPath plan(rw::math::Q qInit, rw::math::Q qGoal);
+	rw::trajectory::QPath plan();
 	rw::common::Ptr<RRTNode> extendTreeInRandomDirection(rw::common::Ptr<RRT> currentTree);
 	bool edgeCollisionDetection(rw::common::Ptr<RRTNode> nodeClose, rw::common::Ptr<RRTNode> nodeNew);
 	rw::common::Ptr<RRTNode> closestNodeInAnyOtherTree(rw::common::Ptr<RRT> &secondTree,rw::common::Ptr<RRT> currentTree,rw::common::Ptr<RRTNode> currentNode);
