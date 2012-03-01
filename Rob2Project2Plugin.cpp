@@ -219,7 +219,7 @@ void SamplePlugin::clickEventRRT() {
 	rws::RobWorkStudio* robWorkStudio = getRobWorkStudio();
 
 	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkcell();
-	rw::models::Device::Ptr device = workcell->findDevice("PA10");
+	rw::models::Device::Ptr device = workcell->findDevice("KukaKr16");
 
 	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
 	CollisionDetector::Ptr collisionDetector = new CollisionDetector(workcell, cdstrategy);
@@ -229,37 +229,23 @@ void SamplePlugin::clickEventRRT() {
 
 	QSampler::Ptr cFree = QSampler::makeConstrained(QSampler::makeUniform(device),constraint);
 
-//	RRTPlanner* planner = new RRTPlanner(robWorkStudio);
-
 	RRTPlanner* planner = new RRTMTPlanner(robWorkStudio);
 	((RRTMTPlanner*)planner)->setEpsilon(.1);
 	((RRTMTPlanner*)planner)->setMinDis(.05);
 	((RRTMTPlanner*)planner)->setNumberOfTree(2);
 
-
-	std::cout << "D 1" << std::endl;
-
 	rw::math::Q qInit = cFree->sample();
 	rw::math::Q qGoal = cFree->sample();
 
-	std::cout << "D 2" << std::endl;
-
 	rw::trajectory::QPath path = ((RRTMTPlanner*)planner)->plan(qInit,qGoal);
-
-	std::cout << "D 3" << std::endl;
-
 	rw::kinematics::State state = workcell->getDefaultState();
 
-	std::cout << "D 4" << std::endl;
-
-	std::cout << "D pathLength " << path.size() << std::endl;
+	std::cout << "pathLength " << path.size() << std::endl;
 
 	robWorkStudio->setTimedStatePath(
 	        TimedUtil::makeTimedStatePath(
 	            *workcell,
 	            rw::models::Models::getStatePath(*device, path, state)));
-
-	std::cout << "D 5" << std::endl;
 }
 
 Q_EXPORT_PLUGIN(SamplePlugin);

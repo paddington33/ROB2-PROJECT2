@@ -2,7 +2,7 @@
  * RRTNode.cpp
  *
  *  Created on: Feb 23, 2012
- *      Author: daniel
+ *      Author: Daniel
  */
 
 #include "RRTNode.h"
