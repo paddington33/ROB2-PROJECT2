@@ -11,6 +11,8 @@ RRTMTPlanner::RRTMTPlanner(rws::RobWorkStudio* robWorkStudio, int connectN) :
 	RRTPlanner(robWorkStudio) ,
 	_connectN(connectN)
 {
+	//Dirty
+
 	_workcell = robWorkStudio->getWorkcell();
 	_device = _workcell->findDevice("KukaKr16");
 	_cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
