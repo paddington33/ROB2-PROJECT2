@@ -174,6 +174,7 @@ void SamplePlugin::initialize() {
     ((RRTMTPlanner*)_planner)->setNumberOfTree(_box2->value());
     ((RRTMTPlanner*)_planner)->setEpsilon(_box1->value());
 	((RRTMTPlanner*)_planner)->setMinDis(_box4->value());
+	_numberOfRuns = 100;
 }
 
 void SamplePlugin::stateChangedListener(const State& state) {
@@ -239,11 +240,25 @@ void SamplePlugin::clickEvent() {
 
 void SamplePlugin::runNplanners(){
 
+	common::Timer timerPlanner;
+
+	std::cout << "1" << std::endl;
+
 	_planner->setWorkCell(_robWorkStudio->getWorkCell()->getDevices().at(0)->getName());
 
+	std::cout << "2" << std::endl;
+
 	for(int i = 1 ; i < _numberOfRuns ; i++ ) {
-		rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
+		timerPlanner.resume();
+//		rw::trajectory::QPath path = ((RRTMTPlanner*)_planner)->plan();
+		timerPlanner.pause();
+		std::cout << "pathLength " << i << " " << std::endl; // path.size() << std::endl;
+
+		//increase progressbar
+		_bar0 -> setValue(i+1);
 	}
+
+	std::cout << "total time: " << timerPlanner.getTime() << "   average time " << timerPlanner.getTime()/_numberOfRuns <<  std::endl;
 }
 
 
