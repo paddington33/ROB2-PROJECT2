@@ -1,0 +1,19 @@
+<WorkCell name="PA10inGranty">
+
+<Frame name="RobotBase" refframe="WORLD">
+    <RPY> 0 0 90</RPY> <Pos> 0 0 2.2</Pos>
+ </Frame>
+
+<Include file="./Mitsubishi_PA10_gantry/pa10.xml" />
+
+	
+	
+	<Drawable name="Environment" refframe="WORLD">
+     <RPY>90 0.0 180.0</RPY><Pos>0.0 0.0 0.0</Pos>
+      <Polytope file = "Geometry/Environment"/> 
+    </Drawable>
+	
+
+ <CollisionSetup file="SceneCollisionSetup.xml" />
+</WorkCell>
+
