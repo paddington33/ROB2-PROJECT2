@@ -13,9 +13,9 @@
 RRT::RRT(){
 }
 
-RRT::RRT(rw::math::Q q){
+RRT::RRT(rw::common::Ptr<RRTNode> node){
 
-	_tree.push_back(new RRTNode(q,NULL));
+	_tree.push_back(node);
 }
 
 RRT::~RRT() {
@@ -24,19 +24,41 @@ RRT::~RRT() {
 
 rw::common::Ptr<RRTNode> RRT::getClosestNode(rw::math::Q node) {
 
+	std::cout << "close 1" << std::endl;
+
 	rw::common::Ptr<RRTNode> closestNode = NULL;
+
+	std::cout << "close 2" << std::endl;
+
 	rw::math::Q tempQ;
+
+	std::cout << "close 3" << std::endl;
+
 	double distanceToNode = std::numeric_limits<double>::max();
 
+	std::cout << "close 4" << std::endl;
+
 	std::list<rw::common::Ptr<RRTNode> >::iterator itt;
+
+	std::cout << "close 5 tree size " << _tree.size()  << std::endl;
 	for (itt = _tree.begin(); itt != _tree.end(); itt++) {
+
+//		std::cout << "close loop " << (*itt)->getValue() << std::endl;
+
 		tempQ = (*itt)->getValue();
+
+//		std::cout << "close 6" << std::endl;
+
 		if((tempQ - node).norm2() < distanceToNode){
 			distanceToNode = (tempQ - node).norm2();
+
+//			std::cout << "close 7" << std::endl;
+
 			closestNode = *itt;
 		}
 	}
 
+	std::cout << "close 8 " << closestNode << std::endl;
 	return closestNode;
 }
 

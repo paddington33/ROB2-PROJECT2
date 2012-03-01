@@ -31,7 +31,6 @@
 
 #include "RRT.h"
 #include "RRTPlanner.h"
-#include "RRTMTPlanner.h"
 
 
 USE_ROBWORK_NAMESPACE
@@ -47,6 +46,15 @@ SamplePlugin::SamplePlugin():
     RobWorkStudioPlugin("SamplePluginName", QIcon(":/pa_icon.png"))
 {
 
+	std::cout << "1" << std::endl;
+
+	//create planner
+	_robWorkStudio = getRobWorkStudio();
+
+	std::cout << "2" << std::endl;
+
+	std::cout << "3" << std::endl;
+
     QWidget* base = new QWidget(this);
     QGridLayout* pLayout = new QGridLayout(base);
     base->setLayout(pLayout);
@@ -54,13 +62,13 @@ SamplePlugin::SamplePlugin():
 
     int row = 0;
 
-    _btn0 = new QPushButton("Run Scene");
+    _btn0 = new QPushButton("Run Planner");
     pLayout->addWidget(_btn0, row++, 0);
-    connect(_btn0, SIGNAL(clicked()), this, SLOT(clickEventRRT()));
+    connect(_btn0, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
-    _btn4 = new QPushButton("Run All");
+    _btn4 = new QPushButton("Run All planner");
     pLayout->addWidget(_btn4, row++, 0);
-    connect(_btn4, SIGNAL(clicked()), this, SLOT(clickEventRRT()));
+    connect(_btn4, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
     _bar0 = new QProgressBar();
  	_bar0 -> setMaximum(edges);
@@ -85,12 +93,6 @@ SamplePlugin::SamplePlugin():
     connect(_checkbox2, SIGNAL(clicked()), this, SLOT(clickEvent()));
     _label2 = new QLabel("Weighted joints");
     pLayout->addWidget(_label2,row++,0);
-
-//    _checkbox3 = new QCheckBox();
-//    pLayout->addWidget(_checkbox3,row,1);
-//    connect(_checkbox3, SIGNAL(clicked()), this, SLOT(clickEvent()));
-//    _label3 = new QLabel("Number of Trees");
-//    pLayout->addWidget(_label3,row++,0);
 
     _label7 = new QLabel("Connect");
     pLayout->addWidget(_label7,row++,0);
@@ -176,19 +178,34 @@ void SamplePlugin::loadScene(std::string scene)
 
 
 void SamplePlugin::clickEvent() {
+
 	QObject *obj = sender();
-	if(obj == _btn0){
-		std::cout <<"test"<<std::endl;
+	if(obj == _btn3){
+		loadScene("PA10InGantry/Scene.wc.xml");
 	} else if(obj == _btn1){
 		loadScene("KukaKr16/Scene.wc.xml");
-	} else if(obj == _btn3){
-		loadScene("PA10InGantry/Scene.wc.xml");
+		_planner = new RRTMTPlanner(_robWorkStudio);
+	} else if(obj == _btn0){
+		clickEventRRT();
 	} else if(obj == _btn4){
-		std::cout <<"test"<<std::endl;
+		//run many planner
 	} else if(obj == _box0){
-		std::cout <<"test"<<std::endl;
+		//nr of runs spinbox
+	} else if(obj == _checkbox0){
+		//edge CD
+	} else if(obj == _checkbox2){
+		//weighted joint
+	} else if(obj == _box3){
+		//connectN
+	} else if(obj == _checkbox1){
+		//connect pearl mode
+	} else if(obj == _combobox0){
+		//swap strategi
+	} else if(obj == _box2){
+		//nr of tree
+	} else if(obj == _box1){
+		//epsilon
 	}
-
 
 
 }
@@ -202,7 +219,7 @@ void SamplePlugin::clickEventRRT() {
 	rws::RobWorkStudio* robWorkStudio = getRobWorkStudio();
 
 	rw::common::Ptr<rw::models::WorkCell> workcell = robWorkStudio->getWorkcell();
-	rw::models::Device::Ptr device = workcell->findDevice("KukaKr16");
+	rw::models::Device::Ptr device = workcell->findDevice("PA10");
 
 	rw::proximity::CollisionStrategy::Ptr cdstrategy = rwlibs::proximitystrategies::ProximityStrategyFactory::makeCollisionStrategy("PQP");
 	CollisionDetector::Ptr collisionDetector = new CollisionDetector(workcell, cdstrategy);
@@ -213,22 +230,36 @@ void SamplePlugin::clickEventRRT() {
 	QSampler::Ptr cFree = QSampler::makeConstrained(QSampler::makeUniform(device),constraint);
 
 //	RRTPlanner* planner = new RRTPlanner(robWorkStudio);
+
 	RRTPlanner* planner = new RRTMTPlanner(robWorkStudio);
+	((RRTMTPlanner*)planner)->setEpsilon(.1);
+	((RRTMTPlanner*)planner)->setMinDis(.05);
+	((RRTMTPlanner*)planner)->setNumberOfTree(2);
+
+
+	std::cout << "D 1" << std::endl;
 
 	rw::math::Q qInit = cFree->sample();
 	rw::math::Q qGoal = cFree->sample();
 
+	std::cout << "D 2" << std::endl;
+
 	rw::trajectory::QPath path = ((RRTMTPlanner*)planner)->plan(qInit,qGoal);
 
+	std::cout << "D 3" << std::endl;
 
 	rw::kinematics::State state = workcell->getDefaultState();
+
+	std::cout << "D 4" << std::endl;
+
+	std::cout << "D pathLength " << path.size() << std::endl;
 
 	robWorkStudio->setTimedStatePath(
 	        TimedUtil::makeTimedStatePath(
 	            *workcell,
 	            rw::models::Models::getStatePath(*device, path, state)));
 
+	std::cout << "D 5" << std::endl;
 }
 
 Q_EXPORT_PLUGIN(SamplePlugin);
-

@@ -22,7 +22,7 @@ private:
 	std::list<rw::common::Ptr<RRTNode> > _tree;
 public:
 	RRT();
-	RRT(rw::math::Q q);
+	RRT(rw::common::Ptr<RRTNode> node);
 	virtual ~RRT();
 
 	bool addNodeToTree(rw::common::Ptr<RRTNode>);

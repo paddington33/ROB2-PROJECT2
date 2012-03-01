@@ -1,11 +1,14 @@
 #ifndef SAMPLEPLUGIN_HPP
 #define SAMPLEPLUGIN_HPP
 
+#include <rws/RobWorkStudio.hpp>
 #include <rw/rw.hpp>
 #include <rws/RobWorkStudioPlugin.hpp>
 #include <rw/math/Q.hpp>
 #include <rw/pathplanning/QConstraint.hpp>
 #include <rw/models/WorkCell.hpp>
+#include "RRTMTPlanner.h"
+
 
 class SamplePlugin: public rws::RobWorkStudioPlugin
 {
@@ -25,11 +28,15 @@ private slots:
     void clickEvent();
     void clickEventRRT();
 
+
+
     void loadScene(std::string scene);
 
     void stateChangedListener(const rw::kinematics::State& state);
 
 private:
+    rws::RobWorkStudio* _robWorkStudio;
+    RRTMTPlanner* _planner;
     QComboBox* _combobox0;
     QPushButton* _btn0,*_btn1,*_btn3,*_btn4;
     QSpinBox* _box0,* _box2,* _box3;
