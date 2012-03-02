@@ -178,6 +178,7 @@ void SamplePlugin::initialize() {
 	((RRTMTPlanner*)_planner)->setedgeDetection(_checkbox0->isChecked());
 
 	_numberOfRuns = 100;
+
 }
 
 void SamplePlugin::stateChangedListener(const State& state) {
@@ -267,6 +268,9 @@ void SamplePlugin::runNplanners(){
 
 		//increase progressbar
 		_bar0 -> setValue(i+1);
+
+		delete _planner;
+
 	}
 
 	std::cout << "total time: " << timerPlanner.getTime() << "   average time " << timerPlanner.getTime()/_numberOfRuns <<  std::endl;

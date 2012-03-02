@@ -90,8 +90,8 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 				mergeTree(currentTree, secondTree, newNode, closestNode);
 
 				//If goal and init nodes are in same tree then return the path between them.
-				if(closestNode->getTree() == newNode->getTree())
-					return getPath(closestNode,newNode);
+				if(initNode->getTree() == goalNode->getTree())
+					return getPath(initNode,goalNode);
 			}
 		}
 		if(connect(currentTree,newNode,closestNode)){
@@ -103,11 +103,12 @@ rw::trajectory::QPath RRTMTPlanner::plan(rw::math::Q qInit, rw::math::Q qGoal)
 		}
 
 		//If goal and init nodes are in same tree then return the path between them.
-		if(closestNode->getTree() == newNode->getTree())
+		if(initNode->getTree() == goalNode->getTree())
 			return getPath(initNode,goalNode);
 	}
 
 	//If not possible to find path return an empty Qpath
+	std::cout << "Not able to determine path!" << std::endl;
 	return NULL;
 }
 
@@ -124,6 +125,7 @@ void RRTMTPlanner::mergeTree(rw::common::Ptr<RRT> firstTree,
 	{
 		tempNode = secondNode->getParrent();
 		secondNode->setParrent(tempParrent);
+		firstTree->addNodeToTree(secondNode);
 		tempParrent = secondNode;
 		secondNode = tempNode;
 	}
@@ -158,9 +160,14 @@ rw::common::Ptr<RRTNode> RRTMTPlanner::extendTreeInRandomDirection(rw::common::P
 	rw::math::Q dirQ = tmpNode->getValue()-cloNode->getValue();
 	rw::math::Q newQ = cloNode->getValue() + dirQ*_epsilon;
 
-	if(!_constraint->inCollision(newQ)){
+	if(!_constraint->inCollision(newQ) ){
 
 		newNode->setValue(newQ);
+
+		if(edgeCollisionDetection(cloNode, newNode)){
+			return NULL;
+		}
+
 		newNode->setParrent(cloNode);
 		currentTree->addNodeToTree(newNode);
 
@@ -278,13 +285,14 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 
 		testCount++;
 		timer2Planner.resume();
-		if ((((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon))
-			reached = true;
+
+			if ((((rw::math::Q) (closestNode->getValue() - tmpQ)).norm2()< _epsilon))
+				reached = true;
 
 
-		inewOldNode->setValue(tmpQ);
-		tmpQ += stpQ;
-		inewNode->setValue(tmpQ);
+			inewOldNode->setValue(tmpQ);
+			tmpQ += stpQ;
+			inewNode->setValue(tmpQ);
 
 		timer2Planner.pause();
 
@@ -305,15 +313,7 @@ bool RRTMTPlanner::connect(rw::common::Ptr<RRT> currentTree, rw::common::Ptr<RRT
 
 
 	if(confInCollition || edgeInCollition){
-
-		if(testCount > _connectN){
-			inewNode->setValue(tmpQ - _connectN*stpQ);
-		}else if(_connectN > 0){
-			inewNode->setValue(tmpQ - (testCount/2)*stpQ);
-		}else{
-			inewNode->setValue(tmpQ - stpQ);
-		}
-
+		inewNode->setValue(tmpQ - stpQ);
 	}
 
 	inewNode->setParrent(newNode);
@@ -341,19 +341,36 @@ rw::trajectory::QPath RRTMTPlanner::getPath(rw::common::Ptr<RRTNode> initNode,rw
 	//The remaining might be aligned such that getParent is pointing from init to goal or opposite
 	if(initNode->getParrent() == NULL)
 	{
+		std::cout << "Path initNode->p == NULL" << std::endl;
+
+		std::cout << "path goalNode's tree: " << goalNode->getTree() << std::endl;
+		std::cout << "path initNode's tree: " << initNode->getTree() << std::endl;
+
 		while(goalNode->getParrent() != NULL)
 		{
+			if(_constraint->inCollision(goalNode->getValue()))
+				std::cout << _constraint->inCollision(goalNode->getValue()) << std::endl;
+
 			path.push_back(goalNode->getValue());
 			goalNode = goalNode->getParrent();
 		}
+		path.push_back(goalNode->getValue());
+
 	}
 	else
 	{
+
+		std::cout << "Path initNode->p != NULL" << std::endl;
+
 		while(initNode->getParrent() != NULL)
 		{
+			if(_constraint->inCollision(initNode->getValue()))
+				std::cout << _constraint->inCollision(initNode->getValue()) << std::endl;
+
 			path.push_back(initNode->getValue());
 			initNode = initNode->getParrent();
 		}
+		path.push_back(initNode->getValue());
 	}
 
 	return path;
